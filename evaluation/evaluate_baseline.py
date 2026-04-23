@@ -1,0 +1,160 @@
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
+import json
+import numpy as np
+from environments.base_env import LunarLanderEnv
+from agents.dqn_agent import DQNAgent
+from agents.ppo_agent import PPOAgent
+from agents.a2c_agent import A2CAgent
+from evaluation.plot import (
+    plot_baseline_distributions,
+    plot_final_performance_bar,
+)
+
+
+# --- Config ---
+N_EVAL_EPISODES = 100
+SEED            = 42
+
+MODEL_PATHS = {
+    "DQN": "results/models/dqn_standard",
+    "PPO": "results/models/ppo_standard",
+    "A2C": "results/models/a2c_standard",
+}
+
+BASELINE_LOG_PATH  = "results/logs/baseline_results.json"
+BASELINE_PLOT_PATH = "results/plots/baseline_distributions.png"
+BASELINE_BAR_PATH  = "results/plots/baseline_performance_bar.png"
+
+
+def evaluate_agent(agent, env: LunarLanderEnv, n_episodes: int) -> list:
+    """
+    Run a frozen agent for n_episodes and return the list of total rewards.
+
+    Args:
+        agent:       A loaded DQNAgent, PPOAgent, or A2CAgent.
+        env:         The environment to evaluate in.
+        n_episodes:  Number of episodes to run.
+
+    Returns:
+        rewards (list): Total reward for each episode.
+    """
+    rewards = []
+
+    for episode in range(n_episodes):
+        obs, _ = env.reset()
+        total_reward = 0.0
+        terminated, truncated = False, False
+
+        while not (terminated or truncated):
+            action = agent.predict(obs)
+            obs, reward, terminated, truncated, _ = env.step(action)
+            total_reward += float(reward)
+
+        rewards.append(total_reward)
+
+        if (episode + 1) % 10 == 0:
+            print(f"  Episode {episode + 1}/{n_episodes} — Reward: {total_reward:.2f}")
+
+    return rewards
+
+
+def compute_stats(rewards: list) -> dict:
+    """Compute summary statistics for a list of episode rewards."""
+    arr = np.array(rewards)
+    return {
+        "mean"         : float(np.mean(arr)),
+        "std"          : float(np.std(arr)),
+        "min"          : float(np.min(arr)),
+        "max"          : float(np.max(arr)),
+        "median"       : float(np.median(arr)),
+        "success_rate" : float(np.sum(arr >= 200) / len(arr)),
+    }
+
+
+def main():
+    all_rewards = {}
+    all_stats   = {}
+
+    # --- Evaluate each algorithm ---
+    agents = {
+        "DQN": DQNAgent,
+        "PPO": PPOAgent,
+        "A2C": A2CAgent,
+    }
+
+    for name, AgentClass in agents.items():
+        print(f"\nEvaluating {name}...")
+        env   = LunarLanderEnv()
+        agent = AgentClass(env=env, seed=SEED)
+        agent.load(MODEL_PATHS[name])
+
+        rewards = evaluate_agent(agent, env, N_EVAL_EPISODES)
+        stats   = compute_stats(rewards)
+        env.close()
+
+        all_rewards[name] = rewards
+        all_stats[name]   = stats
+
+        print(f"  Mean Reward  : {stats['mean']:.2f} +/- {stats['std']:.2f}")
+        print(f"  Median       : {stats['median']:.2f}")
+        print(f"  Min / Max    : {stats['min']:.2f} / {stats['max']:.2f}")
+        print(f"  Success Rate : {stats['success_rate'] * 100:.1f}%")
+
+    # --- Print summary table ---
+    print("\n" + "=" * 55)
+    print(f"{'Algorithm':<12} {'Mean':>8} {'Std':>8} {'Median':>8} {'Success%':>10}")
+    print("=" * 55)
+    for name, stats in all_stats.items():
+        print(f"{name:<12} {stats['mean']:>8.2f} {stats['std']:>8.2f} "
+              f"{stats['median']:>8.2f} {stats['success_rate']*100:>9.1f}%")
+    print("=" * 55)
+
+    # --- Save results log ---
+    log = {
+        "environment"    : "standard",
+        "n_eval_episodes": N_EVAL_EPISODES,
+        "seed"           : SEED,
+        "results"        : {
+            name: {"stats": all_stats[name], "rewards": all_rewards[name]}
+            for name in all_stats
+        }
+    }
+    os.makedirs(os.path.dirname(BASELINE_LOG_PATH), exist_ok=True)
+    with open(BASELINE_LOG_PATH, "w") as f:
+        json.dump(log, f, indent=4)
+    print(f"\nBaseline log saved to {BASELINE_LOG_PATH}")
+
+    # --- Plots ---
+    plot_baseline_distributions(
+        results=all_rewards,
+        save_path=BASELINE_PLOT_PATH
+    )
+
+    # Build log_paths dict in the format plot_final_performance_bar expects
+    # We write temporary per-algorithm logs from our stats
+    temp_log_paths = {}
+    for name, stats in all_stats.items():
+        path = f"results/logs/{name.lower()}_baseline_log.json"
+        temp_log = {
+            "algorithm"    : name,
+            "environment"  : "standard",
+            "mean_reward"  : stats["mean"],
+            "std_reward"   : stats["std"],
+            "success_rate" : stats["success_rate"],
+        }
+        with open(path, "w") as f:
+            json.dump(temp_log, f, indent=4)
+        temp_log_paths[name] = path
+
+    plot_final_performance_bar(
+        log_paths=temp_log_paths,
+        environment="Standard (Baseline)",
+        save_path=BASELINE_BAR_PATH
+    )
+
+
+if __name__ == "__main__":
+    main()

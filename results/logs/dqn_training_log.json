@@ -4,7 +4,7 @@
     "total_timesteps": 500000,
     "eval_episodes": 20,
     "seed": 42,
-    "mean_reward": 231.81640502378292,
-    "std_reward": 78.47246800614627,
-    "success_rate": 0.85
+    "mean_reward": 255.37838685327316,
+    "std_reward": 55.81077511773691,
+    "success_rate": 0.9
 }

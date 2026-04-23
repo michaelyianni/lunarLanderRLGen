@@ -53,7 +53,12 @@ class DQNAgent:
         """
         os.makedirs(os.path.dirname(path), exist_ok=True)
         self.model.save(path)
-        print(f"Model saved to {path}.zip")
+        # Verify the file was saved correctly
+        zip_path = path + ".zip"
+        if os.path.exists(zip_path) and os.path.getsize(zip_path) > 1000:
+            print(f"Model saved successfully to {zip_path} ({os.path.getsize(zip_path) / 1024:.1f} KB)")
+        else:
+            print(f"WARNING: Model file at {zip_path} appears missing or corrupt — please re-run training.")
 
     def load(self, path: str):
         """
