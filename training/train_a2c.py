@@ -13,8 +13,8 @@ TOTAL_TIMESTEPS  = 500_000
 EVAL_EPISODES    = 20
 SEED             = 42
 MODEL_SAVE_PATH  = "results/models/a2c_standard"
-LOG_SAVE_PATH    = "results/logs/a2c_training_log.json"
-CURVE_SAVE_PATH  = "results/logs/a2c_learning_curve.json"
+LOG_SAVE_PATH    = "results/logs/training/a2c_training_log.json"
+CURVE_SAVE_PATH  = "results/logs/training/a2c_learning_curve.json"
 
 
 def evaluate(agent: A2CAgent, env: LunarLanderEnv, n_episodes: int = EVAL_EPISODES):

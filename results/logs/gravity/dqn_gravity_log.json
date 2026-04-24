@@ -1,0 +1,7 @@
+{
+    "algorithm": "DQN",
+    "environment": "gravity",
+    "mean_reward": -0.7214006202758732,
+    "std_reward": 45.08801870090998,
+    "success_rate": 0.02
+}

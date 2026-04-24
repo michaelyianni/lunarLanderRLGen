@@ -1,0 +1,7 @@
+{
+    "algorithm": "DQN",
+    "environment": "wind",
+    "mean_reward": 82.20229416649127,
+    "std_reward": 147.41893793061945,
+    "success_rate": 0.37
+}

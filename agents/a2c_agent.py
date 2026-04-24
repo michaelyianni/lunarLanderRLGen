@@ -21,10 +21,10 @@ class A2CAgent:
         self.model = A2C(
             policy="MlpPolicy",
             env=self.env.env,
-            learning_rate=7e-4,
-            n_steps=5,
+            learning_rate=3e-4,
+            n_steps=64,
             gamma=0.99,
-            gae_lambda=1.0,
+            gae_lambda=0.95,
             ent_coef=0.01,
             vf_coef=0.5,
             max_grad_norm=0.5,

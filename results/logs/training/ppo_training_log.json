@@ -1,0 +1,10 @@
+{
+    "algorithm": "PPO",
+    "environment": "standard",
+    "total_timesteps": 1000000,
+    "eval_episodes": 20,
+    "seed": 42,
+    "mean_reward": 161.36635202133138,
+    "std_reward": 113.36851176619959,
+    "success_rate": 0.65
+}

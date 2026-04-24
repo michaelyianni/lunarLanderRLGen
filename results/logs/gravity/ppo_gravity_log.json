@@ -1,0 +1,7 @@
+{
+    "algorithm": "PPO",
+    "environment": "gravity",
+    "mean_reward": 72.89097058281041,
+    "std_reward": 120.26194823642999,
+    "success_rate": 0.33
+}

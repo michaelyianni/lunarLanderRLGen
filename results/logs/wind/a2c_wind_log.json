@@ -1,0 +1,7 @@
+{
+    "algorithm": "A2C",
+    "environment": "wind",
+    "mean_reward": -0.5097046976819246,
+    "std_reward": 136.73073818254352,
+    "success_rate": 0.03
+}

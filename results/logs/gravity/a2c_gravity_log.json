@@ -1,0 +1,7 @@
+{
+    "algorithm": "A2C",
+    "environment": "gravity",
+    "mean_reward": 40.99083772033669,
+    "std_reward": 129.90014092920288,
+    "success_rate": 0.06
+}

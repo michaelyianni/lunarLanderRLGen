@@ -1,0 +1,7 @@
+{
+    "algorithm": "PPO",
+    "environment": "standard",
+    "mean_reward": 160.36248407440885,
+    "std_reward": 117.8474017540739,
+    "success_rate": 0.6
+}

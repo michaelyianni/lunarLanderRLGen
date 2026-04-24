@@ -9,12 +9,12 @@ from agents.ppo_agent import PPOAgent
 from training.callbacks import EpisodeRewardCallback
 
 
-TOTAL_TIMESTEPS  = 500_000
+TOTAL_TIMESTEPS  = 1_000_000
 EVAL_EPISODES    = 20
 SEED             = 42
 MODEL_SAVE_PATH  = "results/models/ppo_standard"
-LOG_SAVE_PATH    = "results/logs/ppo_training_log.json"
-CURVE_SAVE_PATH  = "results/logs/ppo_learning_curve.json"
+LOG_SAVE_PATH    = "results/logs/training/ppo_training_log.json"
+CURVE_SAVE_PATH  = "results/logs/training/ppo_learning_curve.json"
 
 
 def evaluate(agent: PPOAgent, env: LunarLanderEnv, n_episodes: int = EVAL_EPISODES):

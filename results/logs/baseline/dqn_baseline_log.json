@@ -1,0 +1,7 @@
+{
+    "algorithm": "DQN",
+    "environment": "standard",
+    "mean_reward": 240.6222699390304,
+    "std_reward": 88.18603167697049,
+    "success_rate": 0.85
+}

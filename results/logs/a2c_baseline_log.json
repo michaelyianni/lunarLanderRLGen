@@ -1,7 +1,0 @@
-{
-    "algorithm": "A2C",
-    "environment": "standard",
-    "mean_reward": -114.53684045774163,
-    "std_reward": 44.45615348631912,
-    "success_rate": 0.0
-}

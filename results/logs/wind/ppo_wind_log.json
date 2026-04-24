@@ -1,0 +1,7 @@
+{
+    "algorithm": "PPO",
+    "environment": "wind",
+    "mean_reward": 115.67674399849854,
+    "std_reward": 137.03898050476118,
+    "success_rate": 0.45
+}
