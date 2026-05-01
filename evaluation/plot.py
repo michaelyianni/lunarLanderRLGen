@@ -7,9 +7,10 @@ from evaluation.metrics import smooth_rewards, compute_convergence_episode
 
 # --- Consistent style across all plots ---
 ALGORITHM_COLOURS = {
-    "DQN": "#1f77b4",   # Blue
-    "PPO": "#ff7f0e",   # Orange
-    "A2C": "#2ca02c",   # Green
+    "DQN"     : "#1f77b4",   # Blue
+    "PPO"     : "#ff7f0e",   # Orange
+    "A2C"     : "#2ca02c",   # Green
+    "Ensemble": "#9467bd",   # Purple
 }
 
 SMOOTHING_WINDOW = 50
@@ -88,6 +89,9 @@ def plot_comparison_learning_curves(curve_paths: dict, environment: str = "Stand
     fig, ax = plt.subplots(figsize=(11, 6))
 
     for algorithm, path in curve_paths.items():
+        if path is None:
+            # Ensemble (and any agent without a learning curve) is skipped silently
+            continue
         data     = load_curve(path)
         rewards  = data["episode_rewards"]
         episodes = list(range(1, len(rewards) + 1))

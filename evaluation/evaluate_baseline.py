@@ -8,6 +8,7 @@ from environments.base_env import LunarLanderEnv
 from agents.dqn_agent import DQNAgent
 from agents.ppo_agent import PPOAgent
 from agents.a2c_agent import A2CAgent
+from agents.ensemble_agent import EnsembleAgent
 from evaluation.plot import (
     plot_baseline_distributions,
     plot_final_performance_bar,
@@ -78,7 +79,7 @@ def main():
     all_rewards = {}
     all_stats   = {}
 
-    # --- Evaluate each algorithm ---
+    # --- Evaluate each baseline algorithm ---
     agents = {
         "DQN": DQNAgent,
         "PPO": PPOAgent,
@@ -102,6 +103,31 @@ def main():
         print(f"  Median       : {stats['median']:.2f}")
         print(f"  Min / Max    : {stats['min']:.2f} / {stats['max']:.2f}")
         print(f"  Success Rate : {stats['success_rate'] * 100:.1f}%")
+
+    # --- Evaluate Ensemble ---
+    print("\nEvaluating Ensemble...")
+    env_dqn = LunarLanderEnv()
+    env_ppo = LunarLanderEnv()
+    env_a2c = LunarLanderEnv()
+    ensemble = EnsembleAgent.load(
+        paths=MODEL_PATHS,
+        envs={"DQN": env_dqn, "PPO": env_ppo, "A2C": env_a2c},
+    )
+    env_eval = LunarLanderEnv()
+    rewards  = evaluate_agent(ensemble, env_eval, N_EVAL_EPISODES)
+    stats    = compute_stats(rewards)
+    env_dqn.close()
+    env_ppo.close()
+    env_a2c.close()
+    env_eval.close()
+
+    all_rewards["Ensemble"] = rewards
+    all_stats["Ensemble"]   = stats
+
+    print(f"  Mean Reward  : {stats['mean']:.2f} +/- {stats['std']:.2f}")
+    print(f"  Median       : {stats['median']:.2f}")
+    print(f"  Min / Max    : {stats['min']:.2f} / {stats['max']:.2f}")
+    print(f"  Success Rate : {stats['success_rate'] * 100:.1f}%")
 
     # --- Print summary table ---
     print("\n" + "=" * 55)
