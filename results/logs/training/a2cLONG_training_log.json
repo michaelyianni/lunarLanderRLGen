@@ -1,0 +1,10 @@
+{
+    "algorithm": "A2C",
+    "environment": "standard",
+    "total_timesteps": 5000000,
+    "eval_episodes": 20,
+    "seed": 42,
+    "mean_reward": 22.432727753012834,
+    "std_reward": 138.89020145118636,
+    "success_rate": 0.2
+}

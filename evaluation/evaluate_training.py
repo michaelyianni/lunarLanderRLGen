@@ -13,11 +13,13 @@ from evaluation.plot import (
 DQN_CURVE = "results/logs/training/dqn_learning_curve.json"
 PPO_CURVE = "results/logs/training/ppo_learning_curve.json"
 A2C_CURVE = "results/logs/training/a2c_learning_curve.json"
+A2CLONG_CURVE = "results/logs/training/a2cLONG_learning_curve.json"
 
 # Training summary logs
 DQN_LOG   = "results/logs/training/dqn_training_log.json"
 PPO_LOG   = "results/logs/training/ppo_training_log.json"
 A2C_LOG   = "results/logs/training/a2c_training_log.json"
+A2CLONG_LOG = "results/logs/training/a2cLONG_training_log.json"
 
 
 def run_dqn_only():
@@ -46,6 +48,15 @@ def run_ppo_only():
         algorithm="PPO",
         save_path="results/plots/training/ppo_learning_curve.png"
     )
+    
+def run_a2cLONG_only():
+    """Run plots using only A2CLONG results."""
+    print("Plotting A2CLONG learning curve...")
+    plot_single_learning_curve(
+        curve_path=A2CLONG_CURVE,
+        algorithm="A2CLONG",
+        save_path="results/plots/training/a2cLONG_learning_curve.png"
+    )
 
 
 def run_full_comparison():
@@ -70,5 +81,6 @@ if __name__ == "__main__":
     # run_dqn_only()
     # run_ppo_only()
     # run_a2c_only()
+    run_a2cLONG_only()
 
-    run_full_comparison()
+    # run_full_comparison()

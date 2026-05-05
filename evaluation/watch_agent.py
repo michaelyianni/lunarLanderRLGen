@@ -11,6 +11,7 @@ from environments.noise_env import NoiseEnv
 from agents.dqn_agent import DQNAgent
 from agents.ppo_agent import PPOAgent
 from agents.a2c_agent import A2CAgent
+from agents.ensemble_agent import EnsembleAgent
 
 
 # ─────────────────────────────────────────────
@@ -18,8 +19,8 @@ from agents.a2c_agent import A2CAgent
 #  you watch
 # ─────────────────────────────────────────────
 
-ALGORITHM   = "A2C"       # "DQN", "PPO", or "A2C"
-ENVIRONMENT = "noise"  # "standard", "gravity", "wind", or "noise"
+ALGORITHM   = "Ensemble"       # "DQN", "PPO", "A2C", "A2CLONG", or "Ensemble"
+ENVIRONMENT = "standard"  # "standard", "gravity", "wind", or "noise"
 N_EPISODES  = 100           # Number of episodes to watch
 SEED        = 42
 
@@ -28,6 +29,7 @@ MODEL_PATHS = {
     "DQN": "results/models/dqn_standard",
     "PPO": "results/models/ppo_standard",
     "A2C": "results/models/a2c_standard",
+    "A2CLONG": "results/models/a2c_LONG",
 }
 
 # Agent classes per algorithm
@@ -35,6 +37,7 @@ AGENT_CLASSES = {
     "DQN": DQNAgent,
     "PPO": PPOAgent,
     "A2C": A2CAgent,
+    "A2CLONG": A2CAgent
 }
 
 
@@ -71,12 +74,24 @@ def load_agent(algorithm: str, env: LunarLanderEnv) -> object:
     Loads the appropriate trained agent from disk.
 
     Args:
-        algorithm (str):    Algorithm name ("DQN", "PPO", or "A2C").
+        algorithm (str):    Algorithm name ("DQN", "PPO", "A2C", "A2CLONG", or "Ensemble").
         env (LunarLanderEnv): The environment instance.
 
     Returns:
         The loaded agent.
     """
+    
+    if algorithm == "Ensemble":
+        print("  Loading constituent agents for Ensemble...")
+        agents = []
+        for name, AgentClass in AGENT_CLASSES.items():
+            constituent_env = make_environment(ENVIRONMENT)
+            agent = AgentClass(env=constituent_env, seed=SEED)
+            agent.load(MODEL_PATHS[name])
+            agents.append(agent)
+            print(f"    ✔ {name} loaded")
+        return EnsembleAgent(agents=agents)
+    
     if algorithm not in AGENT_CLASSES:
         raise ValueError(f"Unknown algorithm: '{algorithm}'. "
                          f"Choose from: {list(AGENT_CLASSES.keys())}")
@@ -94,7 +109,7 @@ def watch(algorithm: str, environment: str, n_episodes: int):
     Prints a per-step observation summary and episode results to the console.
 
     Args:
-        algorithm   (str): Algorithm to watch ("DQN", "PPO", or "A2C").
+        algorithm   (str): Algorithm to watch ("DQN", "PPO", "A2C", "A2CLONG", or "Ensemble").
         environment (str): Environment to run in.
         n_episodes  (int): Number of episodes to watch.
     """
