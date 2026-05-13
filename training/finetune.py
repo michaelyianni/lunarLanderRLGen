@@ -64,12 +64,9 @@ def run_finetune(algorithm: str, env_name: str):
 
     # Swap environment so the loaded model trains in the modified env
     agent.model.set_env(env.env)
-    
-    # If algorithm is A2C, train for twice the timesteps to give it a better chance to adapt (A2C is less sample efficient)
-    timesteps = FINETUNE_TIMESTEPS * 2 if algorithm == "A2C" else FINETUNE_TIMESTEPS
 
     callback = EpisodeRewardCallback()
-    agent.train(total_timesteps=timesteps, callback=callback)
+    agent.train(total_timesteps=FINETUNE_TIMESTEPS, callback=callback)
 
     # Save fine-tuned model
     model_path = f"results/models/transfer/{env_name}/{algorithm.lower()}_{env_name}_finetuned"
@@ -84,7 +81,7 @@ def run_finetune(algorithm: str, env_name: str):
             "algorithm"       : algorithm,
             "environment"     : env_name,
             "mode"            : "finetune",
-            "total_timesteps" : timesteps,
+            "total_timesteps" : FINETUNE_TIMESTEPS,
             "episode_rewards" : callback.episode_rewards,
             "episode_lengths" : callback.episode_lengths,
         }, f, indent=4)
@@ -105,8 +102,7 @@ def run_scratch(algorithm: str, env_name: str):
     agent      = AgentClass(env=env, seed=SEED)   # No load — fresh weights
 
     callback = EpisodeRewardCallback()
-    timesteps = FINETUNE_TIMESTEPS * 2 if algorithm == "A2C" else FINETUNE_TIMESTEPS
-    agent.train(total_timesteps=timesteps, callback=callback)
+    agent.train(total_timesteps=FINETUNE_TIMESTEPS, callback=callback)
 
     model_path = f"results/models/transfer/{env_name}/{algorithm.lower()}_{env_name}_scratch"
     agent.save(model_path)
@@ -118,7 +114,7 @@ def run_scratch(algorithm: str, env_name: str):
             "algorithm"       : algorithm,
             "environment"     : env_name,
             "mode"            : "scratch",
-            "total_timesteps" : timesteps,
+            "total_timesteps" : FINETUNE_TIMESTEPS,
             "episode_rewards" : callback.episode_rewards,
             "episode_lengths" : callback.episode_lengths,
         }, f, indent=4)
@@ -133,7 +129,7 @@ def main():
 
     print("=" * 60)
     print("  Transfer Learning — Fine-tuning & Scratch Controls")
-    print(f"  Timesteps per run : {FINETUNE_TIMESTEPS:,}, A2C doubled")
+    print(f"  Timesteps per run : {FINETUNE_TIMESTEPS:,}")
     print(f"  Total runs        : {len(algorithms) * len(environments) * 2}")
     print("=" * 60)
 

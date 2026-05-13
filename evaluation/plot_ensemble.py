@@ -23,9 +23,9 @@ NOISE_STD  = 0.075
 ENVIRONMENTS = ["standard", "gravity", "wind", "noise"]
 ENV_LABELS   = {
     "standard": "Standard",
-    "gravity" : f"Gravity\n(g={GRAVITY})",
-    "wind"    : f"Wind\n(power={WIND_POWER})",
-    "noise"   : f"Noise\n(std={NOISE_STD})",
+    "gravity" : f"Gravity (g={GRAVITY})",
+    "wind"    : f"Wind (power={WIND_POWER})",
+    "noise"   : f"Noise (std={NOISE_STD})",
 }
 
 # Maps each environment to its corresponding log file path
@@ -38,6 +38,8 @@ ENV_LOG_PATHS = {
 
 ALGORITHMS = ["DQN", "PPO", "A2C", "Ensemble"]
 
+DIST_SAVE_DIR = "results/plots/ensemble"
+
 
 def load_results() -> dict:
     """
@@ -46,15 +48,13 @@ def load_results() -> dict:
     log files. Ensemble results are read from ensemble_results.json.
 
     Returns:
-        dict: Nested dict keyed by environment -> algorithm -> stats dict.
+        dict: Nested dict keyed by environment -> algorithm -> {stats, rewards}.
     """
-    # Load all per-environment logs for DQN/PPO/A2C
     env_logs = {}
     for env_name, log_path in ENV_LOG_PATHS.items():
         with open(log_path, "r") as f:
             env_logs[env_name] = json.load(f)
 
-    # Load ensemble log (covers all four environments)
     with open(ENSEMBLE_LOG_PATH, "r") as f:
         ensemble_log = json.load(f)
 
@@ -62,18 +62,23 @@ def load_results() -> dict:
     for env_name in ENVIRONMENTS:
         merged[env_name] = {}
 
-        # DQN, PPO, A2C — read from the correct environment-specific log
+        # DQN, PPO, A2C — stats and rewards from environment-specific log
         log = env_logs[env_name]
         for alg in ["DQN", "PPO", "A2C"]:
             try:
-                merged[env_name][alg] = log["results"][alg]["stats"]
+                merged[env_name][alg] = {
+                    "stats"  : log["results"][alg]["stats"],
+                    "rewards": log["results"][alg]["rewards"],
+                }
             except KeyError:
-                # Gracefully skip if an algorithm is missing from a log
                 pass
 
-        # Ensemble — read from ensemble_results.json
+        # Ensemble — from ensemble_results.json
         try:
-            merged[env_name]["Ensemble"] = ensemble_log["results"][env_name]["stats"]
+            merged[env_name]["Ensemble"] = {
+                "stats"  : ensemble_log["results"][env_name]["stats"],
+                "rewards": ensemble_log["results"][env_name]["rewards"],
+            }
         except KeyError:
             pass
 
@@ -104,7 +109,8 @@ def plot_comparison(merged: dict, save_path: str = None):
         success_rates = []
 
         for env_name in ENVIRONMENTS:
-            stats = merged.get(env_name, {}).get(alg)
+            entry = merged.get(env_name, {}).get(alg)
+            stats = entry["stats"] if entry else None
             if stats is not None:
                 mean_rewards.append(stats["mean"])
                 std_rewards.append(stats["std"])
@@ -130,7 +136,7 @@ def plot_comparison(merged: dict, save_path: str = None):
     ax1.set_xticks(x)
     ax1.set_xticklabels([ENV_LABELS[e] for e in ENVIRONMENTS], fontsize=10)
     ax1.set_ylabel("Mean Reward", fontsize=11)
-    ax1.set_title("Ensemble vs Baselines — Mean Reward", fontsize=12)
+    ax1.set_title("Baseline Performance — Mean Reward", fontsize=12)
     ax1.legend(fontsize=9)
     ax1.grid(axis="y", alpha=0.3)
 
@@ -141,7 +147,7 @@ def plot_comparison(merged: dict, save_path: str = None):
     ax2.set_xticklabels([ENV_LABELS[e] for e in ENVIRONMENTS], fontsize=10)
     ax2.set_ylabel("Success Rate (%)", fontsize=11)
     ax2.set_ylim(0, 115)
-    ax2.set_title("Ensemble vs Baselines — Success Rate", fontsize=12)
+    ax2.set_title("Baseline Performance — Success Rate", fontsize=12)
     ax2.legend(fontsize=9)
     ax2.grid(axis="y", alpha=0.3)
 
@@ -156,9 +162,90 @@ def plot_comparison(merged: dict, save_path: str = None):
         plt.show()
 
 
+def plot_distributions(merged: dict, save_dir: str = DIST_SAVE_DIR):
+    """
+    Produce one box plot distribution figure per environment (4 total).
+    Each figure matches the style of plot_baseline_distributions() in plot.py
+    but includes the Ensemble agent as a fourth box alongside DQN, PPO, A2C.
+    Jittered scatter points are overlaid on each box.
+
+    Saved to:
+        results/plots/ensemble/ensemble_distributions_standard.png
+        results/plots/ensemble/ensemble_distributions_gravity.png
+        results/plots/ensemble/ensemble_distributions_wind.png
+        results/plots/ensemble/ensemble_distributions_noise.png
+
+    Args:
+        merged   (dict): Output from load_results().
+        save_dir (str):  Directory to save plots into.
+    """
+    os.makedirs(save_dir, exist_ok=True)
+
+    for env_name in ENVIRONMENTS:
+        # Collect rewards and colours for each algorithm present
+        algorithms  = []
+        rewards_all = []
+        colours     = []
+
+        for alg in ALGORITHMS:
+            entry = merged.get(env_name, {}).get(alg)
+            if entry is not None and "rewards" in entry:
+                algorithms.append(alg)
+                rewards_all.append(entry["rewards"])
+                colours.append(ALGORITHM_COLOURS.get(alg, "steelblue"))
+
+        if not algorithms:
+            print(f"  No data for {env_name} — skipping.")
+            continue
+
+        fig, ax = plt.subplots(figsize=(10, 6))
+
+        bp = ax.boxplot(
+            rewards_all,
+            patch_artist=True,
+            notch=False,
+            widths=0.4,
+            medianprops=dict(color="black", linewidth=2),
+        )
+
+        # Apply algorithm colours to boxes
+        for patch, colour in zip(bp["boxes"], colours):
+            patch.set_facecolor(colour)
+            patch.set_alpha(0.75)
+
+        # Jittered scatter overlay — consistent with baseline distribution plots
+        for i, (alg, rwd_list) in enumerate(zip(algorithms, rewards_all), start=1):
+            x_jitter = np.random.normal(i, 0.05, size=len(rwd_list))
+            ax.scatter(x_jitter, rwd_list, alpha=0.25, s=12,
+                       color=ALGORITHM_COLOURS.get(alg, "steelblue"))
+
+        # Solved threshold
+        ax.axhline(y=200, color="red", linestyle="--", linewidth=1.2,
+                   label="Solved threshold (200)")
+
+        ax.set_xticks(range(1, len(algorithms) + 1))
+        ax.set_xticklabels(algorithms, fontsize=12)
+        ax.set_ylabel("Total Episode Reward", fontsize=11)
+        ax.set_title(
+            f"Baseline Performance — Reward Distributions\n"
+            f"{ENV_LABELS[env_name]} (100 Episodes)",
+            fontsize=12
+        )
+        ax.legend(fontsize=9)
+        ax.grid(axis="y", alpha=0.3)
+
+        plt.tight_layout()
+
+        save_path = os.path.join(save_dir, f"ensemble_distributions_{env_name}.png")
+        fig.savefig(save_path, dpi=150, bbox_inches="tight")
+        print(f"Distribution plot saved to {save_path}")
+        plt.close(fig)
+
+
 def main():
     merged = load_results()
     plot_comparison(merged, save_path=SAVE_PATH)
+    plot_distributions(merged, save_dir=DIST_SAVE_DIR)
 
 
 if __name__ == "__main__":

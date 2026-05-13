@@ -1,0 +1,6 @@
+AI Statement
+
+- GitHub Copilot (GPT-4.1) was used throughout project implementation for inline coding suggestions, small-scale code completion, and effective comment writing.
+- I used Claude Sonnet 4.6 to assist with experiment automation, JSON result logging, plotting, and repetitive evaluation scripts.
+- AI tools were used to improve development efficiency, but all significant academic decisions — including the project topic, research questions, choice of algorithms, design of environment modifications, metrics, experiments, analysis, conclusions, and final written discussion — were made by me.
+- I reviewed, tested, and understood all generated code before including it in the project.
