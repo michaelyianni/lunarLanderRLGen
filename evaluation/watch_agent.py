@@ -14,12 +14,9 @@ from agents.a2c_agent import A2CAgent
 from agents.ensemble_agent import EnsembleAgent
 
 
-# ─────────────────────────────────────────────
-#  CONFIGURATION — edit these to change what
-#  you watch
-# ─────────────────────────────────────────────
+# --- Config --- (Change these variables to watch different agents/environments)
 
-ALGORITHM   = "Ensemble"       # "DQN", "PPO", "A2C", "A2CLONG", or "Ensemble"
+ALGORITHM   = "DQN"       # "DQN", "PPO", "A2C", "A2CLONG", or "Ensemble"
 ENVIRONMENT = "standard"  # "standard", "gravity", "wind", or "noise"
 N_EPISODES  = 100           # Number of episodes to watch
 SEED        = 42
@@ -41,9 +38,7 @@ AGENT_CLASSES = {
 }
 
 
-# ─────────────────────────────────────────────
-#  HELPERS
-# ─────────────────────────────────────────────
+# --- Helpers ---
 
 def make_environment(environment: str) -> LunarLanderEnv:
     """
@@ -89,7 +84,7 @@ def load_agent(algorithm: str, env: LunarLanderEnv) -> object:
             agent = AgentClass(env=constituent_env, seed=SEED)
             agent.load(MODEL_PATHS[name])
             agents.append(agent)
-            print(f"    ✔ {name} loaded")
+            print(f"    SUCCESS: {name} loaded")
         return EnsembleAgent(agents=agents)
     
     if algorithm not in AGENT_CLASSES:
@@ -128,7 +123,7 @@ def watch(algorithm: str, environment: str, n_episodes: int):
         terminated   = False
         truncated    = False
 
-        print(f"\nEpisode {episode}/{n_episodes} — starting...")
+        print(f"\nEpisode {episode}/{n_episodes} - starting...")
 
         while not (terminated or truncated):
             action               = agent.predict(obs)
@@ -137,7 +132,7 @@ def watch(algorithm: str, environment: str, n_episodes: int):
             steps               += 1
 
         # Episode outcome
-        outcome = "✅ LANDED" if total_reward >= 200 else "❌ FAILED"
+        outcome = "LANDED" if total_reward >= 200 else "FAILED"
         print(f"  {outcome}  |  Steps: {steps:>4}  |  Total Reward: {total_reward:>8.2f}")
 
         # Brief pause between episodes so the window doesn't close instantly
@@ -148,9 +143,7 @@ def watch(algorithm: str, environment: str, n_episodes: int):
     print("\nDone.")
 
 
-# ─────────────────────────────────────────────
-#  ENTRY POINT
-# ─────────────────────────────────────────────
+# Entry Point
 
 if __name__ == "__main__":
     watch(

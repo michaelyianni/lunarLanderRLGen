@@ -25,7 +25,7 @@ class GravityEnv(LunarLanderEnv):
             render_mode=render_mode,
             gravity=-11.9,
         )
-        # Override gravity directly on the unwrapped environment - Gymnasium restricts gravity limit to above 12.0
+        # Override gravity directly on the unwrapped environment - Gymnasium restricts gravity limit to above -12.0
         self.env.unwrapped.gravity = gravity
         
         self.observation_space = self.env.observation_space
