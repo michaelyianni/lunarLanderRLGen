@@ -59,11 +59,11 @@ def make_environment(environment: str) -> LunarLanderEnv:
     if environment == "standard":
         return LunarLanderEnv(render_mode="human")
     elif environment == "gravity":
-        return GravityEnv(render_mode="human", gravity=-15.0)
+        return GravityEnv(render_mode="human", gravity=-13.0)
     elif environment == "wind":
         return WindEnv(render_mode="human", wind_power=15, turbulence_power=1.5)
     elif environment == "noise":
-        return NoiseEnv(render_mode="human", noise_std=0.05, seed=SEED)
+        return NoiseEnv(render_mode="human", noise_std=0.075, seed=SEED)
     else:
         raise ValueError(f"Unknown environment: '{environment}'. "
                          f"Choose from: 'standard', 'gravity', 'wind', 'noise'.")

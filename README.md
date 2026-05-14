@@ -1,14 +1,13 @@
 # LunarLander RL Generalisation Study
 
-An investigation into how different reinforcement learning algorithms (DQN, PPO, A2C) generalise to modified environments in the Gymnasium LunarLander task.
-
-## Research Question
-How do different reinforcement learning algorithms generalise to modified environments in the LunarLander task?
+- RS1: How do different reinforcement learning algorithms generalise to modified environments in the LunarLander task?
+- RS2: How does transfer learning from a standard training environment affect the re-convergence speed and final performance of different reinforcement learning algorithms when deployed in modified LunarLander environments?
 
 ## Algorithms
 - Deep Q-Network (DQN)
 - Proximal Policy Optimisation (PPO)
 - Advantage Actor-Critic (A2C)
+- Ensemble (combining the three above via majority vote)
 
 ## Environment Modifications
 - Increased gravity
@@ -34,5 +33,3 @@ pip install -r requirements.txt
 - `training/` - Training scripts per algorithm
 - `evaluation/` - Evaluation scripts and metrics
 - `results/` - Saved models, logs, and plots
-- `notebooks/` - Exploratory analysis notebooks
-- `report/` - Final coursework report

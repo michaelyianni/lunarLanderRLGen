@@ -15,9 +15,7 @@ from agents.a2c_agent     import A2CAgent
 from agents.ensemble_agent import EnsembleAgent
 
 
-# ─────────────────────────────────────────────
-#  CONFIGURATION
-# ─────────────────────────────────────────────
+# --- Config ---
 
 N_EVAL_EPISODES = 100
 SEED            = 42
@@ -38,9 +36,7 @@ ENSEMBLE_FROZEN_LOG = "results/logs/ensemble/ensemble_results.json"
 LOG_PATH = "results/logs/transfer/transfer_results.json"
 
 
-# ─────────────────────────────────────────────
-#  HELPERS
-# ─────────────────────────────────────────────
+# --- Helpers ---
 
 def make_env(env_name: str):
     """Instantiate the appropriate modified environment."""
@@ -108,19 +104,17 @@ def build_ensemble(env_name: str, mode: str) -> tuple:
     return ensemble, constituent_envs
 
 
-# ─────────────────────────────────────────────
-#  MAIN
-# ─────────────────────────────────────────────
+# Entry point
 
 def main():
     print("=" * 60)
     print("  Transfer Learning — Evaluation")
     print("=" * 60)
 
-    # keyed: env_name → algorithm → mode → {stats, rewards}
+    # keyed: env_name -> algorithm -> mode -> {stats, rewards}
     all_results = {}
 
-    # ── Individual algorithms (DQN, PPO, A2C) ───────────────────
+    # --- Individual algorithms (DQN, PPO, A2C) ---
     for env_name in ENVIRONMENTS:
         all_results[env_name] = {}
 
@@ -150,7 +144,7 @@ def main():
                       f"Std: {stats['std']:.2f}  "
                       f"Success: {stats['success_rate']*100:.1f}%")
 
-    # ── Ensemble (fine-tuned and scratch) ────────────────────────
+    # --- Ensemble (fine-tuned and scratch) ---
     for env_name in ENVIRONMENTS:
         all_results[env_name]["Ensemble"] = {}
 
@@ -179,7 +173,7 @@ def main():
                   f"Std: {stats['std']:.2f}  "
                   f"Success: {stats['success_rate']*100:.1f}%")
 
-    # ── Load frozen Ensemble results from existing log ───────────
+    # --- Load frozen Ensemble results from existing log ---
     print("\n  Loading frozen Ensemble results from ensemble log...")
     try:
         with open(ENSEMBLE_FROZEN_LOG, "r") as f:
@@ -191,12 +185,12 @@ def main():
                 "stats"  : frozen_stats,
                 "rewards": frozen_rewards,
             }
-            print(f"    ✔ Frozen Ensemble loaded for {env_name}  "
+            print(f"    SUCCESS: Frozen Ensemble loaded for {env_name}  "
                   f"(Success: {frozen_stats['success_rate']*100:.1f}%)")
     except (FileNotFoundError, KeyError) as e:
         print(f"    WARNING: Could not load frozen ensemble results — {e}")
 
-    # ── Summary table ────────────────────────────────────────────
+    # --- Summary table ---
     all_algorithms = ALGORITHMS + ["Ensemble"]
     all_modes      = MODES + ["frozen"]
 
@@ -216,7 +210,7 @@ def main():
                     pass
     print("=" * 75)
 
-    # ── Save ─────────────────────────────────────────────────────
+    # --- Save ---
     os.makedirs(os.path.dirname(LOG_PATH), exist_ok=True)
     with open(LOG_PATH, "w") as f:
         json.dump({

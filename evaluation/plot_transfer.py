@@ -9,9 +9,7 @@ from evaluation.plot import ALGORITHM_COLOURS, SMOOTHING_WINDOW
 from evaluation.metrics import smooth_rewards
 
 
-# ─────────────────────────────────────────────
-#  CONFIGURATION
-# ─────────────────────────────────────────────
+# --- Config ---
 
 TRANSFER_LOG_PATH = "results/logs/transfer/transfer_results.json"
 FROZEN_LOG_PATHS  = {
@@ -34,9 +32,9 @@ ENV_LABELS = {
 SAVE_DIR = "results/plots/transfer"
 
 
-# ───────────────────────────────────────���─────
-#  PLOT 1 — Recovery Curves (one file per environment)
-# ─────────────────────────────────────────────
+
+#  Plot 1 - Recovery Curves (one file per environment)
+
 
 def plot_recovery_curves():
     """
@@ -102,9 +100,8 @@ def plot_recovery_curves():
         print(f"Recovery curves saved to {save_path}")
 
 
-# ─────────────────────────────────────────────
-#  PLOT 2 — Final Performance Comparison (Success Rate)
-# ─────────────────────────────────────────────
+
+#  Plot 2 - Final Performance Comparison (Success Rate)
 
 def plot_final_performance():
     """
@@ -190,9 +187,7 @@ def plot_final_performance():
     print(f"Transfer comparison saved to {save_path}")
 
 
-# ─────────────────────────────────────────────
-#  PLOT 3 — Reward Distributions (Box Plots)
-# ─────────────────────────────────────────────
+#  Plot 3 - Reward Distributions (Box Plots)
 
 def plot_transfer_distributions():
     """
@@ -310,7 +305,7 @@ def plot_transfer_distributions():
         )
         ax.grid(axis="y", alpha=0.3)
 
-        # --- Legends — both placed outside the plot area below the axes ---
+        # --- Legends - both placed outside the plot area below the axes ---
         mode_handles = [
             plt.Rectangle((0, 0), 1, 1, facecolor="grey",
                            alpha=0.30, hatch="//", label="Frozen"),
@@ -329,7 +324,7 @@ def plot_transfer_distributions():
                        linewidth=1.2, label="Solved threshold (200)")
         ]
 
-        # Mode legend — bottom left
+        # Mode legend - bottom left
         legend_mode = fig.legend(
             handles=mode_handles,
             title="Mode",
@@ -341,7 +336,7 @@ def plot_transfer_distributions():
         )
         fig.add_artist(legend_mode)
 
-        # Algorithm + threshold legend — bottom right
+        # Algorithm + threshold legend - bottom right
         fig.legend(
             handles=alg_handles,
             loc="lower right",
@@ -361,9 +356,7 @@ def plot_transfer_distributions():
         print(f"Distribution plot saved to {save_path}")
 
 
-# ─────────────────────────────────────────────
-#  ENTRY POINT
-# ─────────────────────────────────────────────
+# Entry Point
 
 def main():
     plot_recovery_curves()

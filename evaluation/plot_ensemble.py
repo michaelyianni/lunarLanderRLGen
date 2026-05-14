@@ -62,7 +62,7 @@ def load_results() -> dict:
     for env_name in ENVIRONMENTS:
         merged[env_name] = {}
 
-        # DQN, PPO, A2C — stats and rewards from environment-specific log
+        # DQN, PPO, A2C - stats and rewards from environment-specific log
         log = env_logs[env_name]
         for alg in ["DQN", "PPO", "A2C"]:
             try:
@@ -73,7 +73,7 @@ def load_results() -> dict:
             except KeyError:
                 pass
 
-        # Ensemble — from ensemble_results.json
+        # Ensemble - from ensemble_results.json
         try:
             merged[env_name]["Ensemble"] = {
                 "stats"  : ensemble_log["results"][env_name]["stats"],
@@ -213,7 +213,7 @@ def plot_distributions(merged: dict, save_dir: str = DIST_SAVE_DIR):
             patch.set_facecolor(colour)
             patch.set_alpha(0.75)
 
-        # Jittered scatter overlay — consistent with baseline distribution plots
+        # Jittered scatter overlay - consistent with baseline distribution plots
         for i, (alg, rwd_list) in enumerate(zip(algorithms, rewards_all), start=1):
             x_jitter = np.random.normal(i, 0.05, size=len(rwd_list))
             ax.scatter(x_jitter, rwd_list, alpha=0.25, s=12,

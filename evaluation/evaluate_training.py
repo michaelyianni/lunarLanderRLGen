@@ -68,12 +68,6 @@ def run_full_comparison():
         save_path="results/plots/training/comparison_learning_curves.png"
     )
 
-    # print("Plotting final performance bar charts...")
-    # plot_final_performance_bar(
-    #     log_paths={"DQN": DQN_LOG, "PPO": PPO_LOG, "A2C": A2C_LOG},
-    #     environment="Standard",
-    #     save_path="results/plots/training/comparison_performance_bar.png"
-    # )
 
 
 if __name__ == "__main__":
@@ -81,6 +75,6 @@ if __name__ == "__main__":
     # run_dqn_only()
     # run_ppo_only()
     # run_a2c_only()
-    run_a2cLONG_only()
+    # run_a2cLONG_only()
 
-    # run_full_comparison()
+    run_full_comparison()

@@ -15,9 +15,7 @@ from agents.a2c_agent import A2CAgent
 from training.callbacks import EpisodeRewardCallback
 
 
-# ─────────────────────────────────────────────
-#  CONFIGURATION
-# ─────────────────────────────────────────────
+# --- Config ---
 
 FINETUNE_TIMESTEPS = 200_000   # Budget for fine-tuning and scratch runs
 EVAL_EPISODES      = 20
@@ -53,7 +51,7 @@ def run_finetune(algorithm: str, env_name: str):
     Load the baseline model, swap the environment, and continue training.
     Saves the fine-tuned model and its learning curve.
     """
-    print(f"\n  Fine-tuning {algorithm} → {env_name}...")
+    print(f"\n  Fine-tuning {algorithm} -> {env_name}...")
 
     env        = make_env(env_name)
     AgentClass = AGENT_CLASSES[algorithm]
@@ -87,19 +85,19 @@ def run_finetune(algorithm: str, env_name: str):
         }, f, indent=4)
 
     env.close()
-    print(f"    ✔ Saved to {model_path}")
+    print(f"    SUCCESS: Saved to {model_path}")
 
 
 def run_scratch(algorithm: str, env_name: str):
     """
     Train a fresh agent from random initialisation in the modified environment.
-    This is the control — used to assess whether pre-training actually helps.
+    This is the control - used to assess whether pre-training actually helps.
     """
-    print(f"\n  Scratch training {algorithm} → {env_name}...")
+    print(f"\n  Scratch training {algorithm} -> {env_name}...")
 
     env        = make_env(env_name)
     AgentClass = AGENT_CLASSES[algorithm]
-    agent      = AgentClass(env=env, seed=SEED)   # No load — fresh weights
+    agent      = AgentClass(env=env, seed=SEED)   # No load - fresh weights
 
     callback = EpisodeRewardCallback()
     agent.train(total_timesteps=FINETUNE_TIMESTEPS, callback=callback)
@@ -120,7 +118,7 @@ def run_scratch(algorithm: str, env_name: str):
         }, f, indent=4)
 
     env.close()
-    print(f"    ✔ Saved to {model_path}")
+    print(f"    SUCCESS: Saved to {model_path}")
 
 
 def main():
@@ -133,22 +131,22 @@ def main():
     print(f"  Total runs        : {len(algorithms) * len(environments) * 2}")
     print("=" * 60)
 
-    # for env_name in environments:
-    #     for algorithm in algorithms:
-    #         run_finetune(algorithm, env_name)
-    #         run_scratch(algorithm, env_name)
+    for env_name in environments:
+        for algorithm in algorithms:
+            run_finetune(algorithm, env_name)
+            run_scratch(algorithm, env_name)
     
     
     # Or run a single algorithm
     
-    algorithm = "A2C"
+    # algorithm = "A2C"
     
-    for env_name in environments:
+    # for env_name in environments:
         
-        run_finetune(algorithm, env_name)
-        run_scratch(algorithm, env_name)
+    #     run_finetune(algorithm, env_name)
+    #     run_scratch(algorithm, env_name)
 
-    print("\n✅ All fine-tuning and scratch runs complete.")
+    print("\n SUCCESS: All fine-tuning and scratch runs complete.")
 
 
 if __name__ == "__main__":

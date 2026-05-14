@@ -6,6 +6,7 @@ __pycache__/
 *.egg-info/
 
 # Results (optionally ignore large model files)
+results/models/transfer/**/*.zip
 results/models/*.zip
 
 # Jupyter checkpoints
