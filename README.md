@@ -33,3 +33,7 @@ pip install -r requirements.txt
 - `training/` - Training scripts per algorithm
 - `evaluation/` - Evaluation scripts and metrics
 - `results/` - Saved models, logs, and plots
+
+## Documentation
+
+- **[Final Report: Generalisation and Adaptation in Reinforcement Learning](./Generalisation%20and%20Adaptation%20in%20Reinforcement%20Learning.pdf)** - Comprehensive analysis of RL generalization findings
